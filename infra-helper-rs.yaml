@@ -25,4 +25,4 @@ spec:
       serviceAccountName: utility
       containers:
       - name: php-redis
-        image: gopinatht/infra_helper
+        image: gopinatht/infra-helper

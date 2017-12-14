@@ -13,5 +13,5 @@
 # limitations under the License.
 
 FROM debian
-COPY ./infra_helper /infra_helper
-ENTRYPOINT /infra_helper
+COPY ./bin/infra-helper /infra-helper
+ENTRYPOINT /infra-helper

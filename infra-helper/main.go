@@ -20,10 +20,11 @@ import (
 	"fmt"
 	"time"
 
-	"k8s.io/apimachinery/pkg/api/errors"
+	//"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
+	"github.com/gopinatht/infra-helper/podutils"
 )
 
 func main() {
@@ -39,10 +40,18 @@ func main() {
 	}
 	for {
 		pods, err := clientset.CoreV1().Pods("").List(metav1.ListOptions{})
+
 		if err != nil {
 			panic(err.Error())
 		}
 		fmt.Printf("There are %d pods in the cluster\n", len(pods.Items))
+
+		// Iterate over the pods
+		for _, pod := range pods.Items {
+			
+			podIp := podutils.GetPodNetworkDetails(pod)
+			fmt.Printf("The pod IP is: %s\n", podIp)
+		}
 
 		time.Sleep(10 * time.Second)
 	}
