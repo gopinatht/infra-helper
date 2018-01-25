@@ -17,12 +17,45 @@ limitations under the License.
 package podutils
 
 import (
-	"k8s.io/api/core/v1"
+	"fmt"
+	"net"
+	"os"
+	"strings"
 )
 
-func GetPodNetworkDetails(pod v1.Pod) (podIp string) {
-    
-    podIp=pod.Status.PodIP
+func GetPodNetworkDetails() (podIp string, hwAddr string) {
 
-    return
+	podIp = os.Getenv("MY_POD_IP")
+	hwAddr = ""
+	l, err := net.Interfaces()
+	found := false
+
+	if err == nil {
+		for _, f := range l {
+
+			addrs, err := f.Addrs()
+
+			if err == nil {
+
+				for _, addr := range addrs {
+
+					if strings.Contains(addr.String(), podIp) {
+						fmt.Printf("Interface Name: %s\n", f.Name)
+						fmt.Printf("Interface Address: %s\n", addr.String())
+						fmt.Printf("Interface HW Address: %s\n", f.HardwareAddr.String())
+						hwAddr = f.HardwareAddr.String()
+						found = true
+						break
+					}
+				}
+
+			}
+
+			if found {
+				break
+			}
+
+		}
+	}
+	return
 }

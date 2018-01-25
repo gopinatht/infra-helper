@@ -18,41 +18,53 @@ package main
 
 import (
 	"fmt"
-	"time"
+	"log"
+	"os"
+	"os/signal"
+	"syscall"
 
 	//"k8s.io/apimachinery/pkg/api/errors"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/rest"
+
 	"github.com/gopinatht/infra-helper/podutils"
 )
 
 func main() {
+
+	podIp, hwAddr := podutils.GetPodNetworkDetails()
+	fmt.Printf("The pod IP is: %s\n", podIp)
+	fmt.Printf("The pod HW Address is: %s\n", hwAddr)
 	// creates the in-cluster config
-	config, err := rest.InClusterConfig()
-	if err != nil {
-		panic(err.Error())
-	}
-	// creates the clientset
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		panic(err.Error())
-	}
-	for {
-		pods, err := clientset.CoreV1().Pods("").List(metav1.ListOptions{})
+	// config, err := rest.InClusterConfig()
+	// if err != nil {
+	// 	panic(err.Error())
+	// }
+	// // creates the clientset
+	// clientset, err := kubernetes.NewForConfig(config)
+	// if err != nil {
+	// 	panic(err.Error())
+	// }
+	// for {
+	// 	pods, err := clientset.CoreV1().Pods("").List(metav1.ListOptions{})
 
-		if err != nil {
-			panic(err.Error())
-		}
-		fmt.Printf("There are %d pods in the cluster\n", len(pods.Items))
+	// 	if err != nil {
+	// 		panic(err.Error())
+	// 	}
+	// 	fmt.Printf("There are %d pods in the cluster\n", len(pods.Items))
 
-		// Iterate over the pods
-		for _, pod := range pods.Items {
-			
-			podIp := podutils.GetPodNetworkDetails(pod)
-			fmt.Printf("The pod IP is: %s\n", podIp)
-		}
+	// 	// Iterate over the pods
+	// 	for _, pod := range pods.Items {
 
-		time.Sleep(10 * time.Second)
-	}
+	// 		pod.
+
+	// 		podIp := podutils.GetPodNetworkDetails(pod)
+	// 		fmt.Printf("The pod IP is: %s\n", podIp)
+	// 	}
+
+	// 	time.Sleep(10 * time.Second)
+	// }
+	signalChan := make(chan os.Signal, 1)
+	signal.Notify(signalChan, syscall.SIGINT, syscall.SIGTERM)
+	<-signalChan
+
+	log.Println("Shutdown signal received, exiting...")
 }
